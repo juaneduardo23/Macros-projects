@@ -1,0 +1,62 @@
+Sub ExportarDatosYAplicarFormato4598()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets("Espacio de Trabajo") ' Reemplaza "Espacio de Trabajo" con el nombre real de tu hoja
+    
+    Dim outputWorkbook As Workbook
+    Set outputWorkbook = Workbooks.Add ' Crear un nuevo libro de trabajo
+    
+    Dim outputWs As Worksheet
+    Set outputWs = outputWorkbook.Sheets(1) ' Hoja en el nuevo libro
+    
+    ' Cambiar el nombre de la hoja en el nuevo libro a "Depos"
+    outputWs.Name = "Depos"
+    
+    ' Definir el rango de encabezado y datos
+    Dim encabezadoRange As Range
+    Set encabezadoRange = ws.Range("J13:P13")
+    
+    Dim datosRange As Range
+    Set datosRange = encabezadoRange.Offset(1, 0).Resize(ws.Rows.Count - encabezadoRange.Row - 1, encabezadoRange.Columns.Count)
+    
+    ' Filtrar solo las celdas no vacías
+    Dim datosFiltrados As Range
+    On Error Resume Next
+    Set datosFiltrados = datosRange.SpecialCells(xlCellTypeConstants)
+    On Error GoTo 0
+    
+    ' Copiar los encabezados y los datos filtrados al nuevo libro SOLO como valores
+    encabezadoRange.Copy
+    outputWs.Range("A1").PasteSpecial Paste:=xlPasteValues
+    
+    If Not datosFiltrados Is Nothing Then
+        datosFiltrados.Copy
+        outputWs.Cells(encabezadoRange.Rows.Count + 1, 1).PasteSpecial Paste:=xlPasteValues
+    End If
+    
+    Application.CutCopyMode = False ' Limpiar el portapapeles
+    
+    ' Formatear encabezados en el nuevo libro
+    With outputWs.Range("A1:G1")
+        .Interior.color = RGB(164, 188, 194) ' Color celeste (#A4BCC2) en RGB
+        .Font.color = RGB(255, 255, 255) ' Color de fuente blanco
+        .Font.Bold = True ' Fuente en negrita
+        .HorizontalAlignment = xlCenter ' Alinear al centro horizontal
+    End With
+    
+    ' Formatear celdas con borde punteado en el nuevo libro
+    If Not datosFiltrados Is Nothing Then
+        With outputWs.Range("A2:G" & (encabezadoRange.Rows.Count + datosFiltrados.Rows.Count))
+            .Borders.LineStyle = xlDot ' Estilo de línea punteada
+            .Borders.Weight = xlThin ' Grosor normal
+        End With
+    End If
+
+    ' Guardar el nuevo libro en la ubicación especificada
+    Dim outputPath As String
+    outputPath = "C:\Users\Juan Eduardo\OneDrive\Documentos\Prueba VBA Sura\output operaciones depos.xlsx"
+    outputWorkbook.SaveAs outputPath
+    
+    ' Abrir el nuevo libro
+    outputWorkbook.Close SaveChanges:=False
+    Workbooks.Open outputPath
+End Sub
