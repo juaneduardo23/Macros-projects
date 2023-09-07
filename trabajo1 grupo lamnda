@@ -1,0 +1,69 @@
+Sub AnalizarPaginaWebYCerrar()
+    Dim IE As Object
+    Dim HTMLDoc As Object
+    Dim i As Integer
+    Dim link As Object
+    Dim form As Object
+    Dim frame As Object
+    Dim table As Object
+    Dim ws As Worksheet
+    
+    ' Crear una instancia de Internet Explorer
+    Set IE = CreateObject("InternetExplorer.Application")
+    
+    ' Abrir Internet Explorer en pantalla completa
+    IE.FullScreen = True
+    
+    ' Navegar a la URL deseada
+    IE.Navigate "https://www.senamhi.gob.pe/?&p=estaciones"
+    
+    ' Esperar hasta que la página se cargue completamente
+    Do While IE.Busy Or IE.ReadyState <> 4
+        DoEvents
+    Loop
+    
+    ' Obtener el documento HTML de la página
+    Set HTMLDoc = IE.document
+    
+    ' Crear una hoja de Excel para mostrar los resultados
+    Set ws = ThisWorkbook.Sheets.Add
+    
+    ' Encontrar e imprimir hipervínculos
+    i = 1
+    For Each link In HTMLDoc.getElementsByTagName("a")
+        ws.Cells(i, 1).Value = "Hipervínculo " & i
+        ws.Cells(i, 2).Value = link.href
+        i = i + 1
+    Next link
+    
+    ' Encontrar e imprimir formularios
+    i = 1
+    For Each form In HTMLDoc.getElementsByTagName("form")
+        ws.Cells(i, 4).Value = "Formulario " & i
+        ws.Cells(i, 5).Value = form.Name
+        i = i + 1
+    Next form
+    
+    ' Encontrar e imprimir marcos (iframes)
+    i = 1
+    For Each frame In HTMLDoc.getElementsByTagName("iframe")
+        ws.Cells(i, 7).Value = "Marco " & i
+        ws.Cells(i, 8).Value = frame.src
+        i = i + 1
+    Next frame
+    
+    ' Encontrar e imprimir tablas
+    i = 1
+    For Each table In HTMLDoc.getElementsByTagName("table")
+        ws.Cells(i, 10).Value = "Tabla " & i
+        ws.Cells(i, 11).Value = table.outerHTML
+        i = i + 1
+    Next table
+    
+    ' Cerrar Internet Explorer
+    IE.Quit
+    Set IE = Nothing
+    
+    ' Mostrar la hoja de Excel con los resultados
+    ws.Activate
+End Sub
