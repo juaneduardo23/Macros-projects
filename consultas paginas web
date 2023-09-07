@@ -1,0 +1,93 @@
+Sub SSI_ConsultaInviertePE()
+Dim URL As String, celda As String, webCodigoSNIP As String
+   For Each c In Selection.Cells
+        webCodigoSNIP = c.Value
+        URL = "https://ofi5.mef.gob.pe/invierte/consultapublica/consultainversiones"
+        celda = c.Address(False, False)
+        Call ie_windows_Invierte(URL, webCodigoSNIP, celda)
+   Next c
+End Sub
+Sub ie_windows_Invierte(textweb As String, snip As String, celda)
+    Dim ieApp As InternetExplorer
+    Dim ieDoc As Object
+    Dim ieTable As Object
+    Dim elem As Object
+    Dim Website As String, codcaptcha As String
+    HojaIni = ActiveSheet.Name
+       
+    Website = textweb
+    'Debug.Print Website
+    'Application.Wait Time + TimeSerial(0, 0, 1)
+    Set ieApp = New InternetExplorer
+'----------------------------------------------------
+    With ieApp
+        .AddressBar = False 'True
+        .MenuBar = False 'True
+        .Toolbar = False 'True
+        .Width = 1500& '0&  'Ancho 500&
+        .Height = 800& '0& 'Altura 500&
+        .Left = 0& '1030&   'Izquierda
+        .Top = 0& '960&    'Alto
+        '.Document.parentWindow.Scroll 200&, 200&
+        .Visible = True
+        .navigate Website
+        .Resizable = True
+        'While Not .ReadyState = READYSTATE_COMPLETE
+        'DoEvents
+        'Wend
+        Do While .Busy: DoEvents: Loop
+        Do Until .readyState = READYSTATE_COMPLETE: DoEvents: Loop
+        
+    End With
+    
+    'Do While ieApp.Busy: DoEvents: Loop
+    'Do Until ieApp.ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+    Set ieDoc = ieApp.document
+     
+    Application.Wait Time + TimeSerial(0, 0, 1)
+    
+    'Set ieTable = ieDoc.getElementsById("divCaptcha")
+    'CodCapcha = ieDoc.getElementsByClassName("captcha").outerHTML
+   
+    For Each e In ieDoc.getElementsByClassName("captcha")
+        CodCapcha = e.outerHTML
+    Next e
+   
+    webTexto = UCase(CodCapcha)
+    webTexto = Replace(webTexto, Chr(13) + Chr(10), "|")
+    'Debug.Print webTexto
+    webTexto = Replace(webTexto, Chr(34), "")
+    webTexto = Replace(webTexto, "<DIV CLASS=CAPTCHA ID=DIVCAPTCHA>", "")
+    webTexto = Replace(webTexto, "<TABLE><TR><TD>", "")
+    webTexto = Replace(webTexto, "</TD><TD>", "")
+    webTexto = Replace(webTexto, "</TD></TR></TABLE></DIV>", "")
+    Debug.Print webTexto
+    
+    With ieDoc.forms("frmBusqueda")
+        .txtCodigoFiltro.Value = snip
+        .txtCaptchaText.Value = webTexto
+        .btnBuscar.Click
+    End With
+    
+    Application.Wait Time + TimeSerial(0, 0, 1)
+    
+    Do While ieApp.Busy: DoEvents: Loop
+    Do Until ieApp.readyState = READYSTATE_COMPLETE: DoEvents: Loop
+    
+    'For Each k In ieDoc.Links
+    '    Debug.Print k.href
+    'Next
+    On Error Resume Next
+    direccion = ieDoc.Links(1).href
+    
+    With Range(celda)
+        'Link FORMATO N°2
+        .Offset(0, 1).Value = ieDoc.Links(1).href
+    End With
+    
+    Set ieDoc = Nothing
+    
+    ieApp.Quit
+    Set ieApp = Nothing
+    
+End Sub
