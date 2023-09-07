@@ -1,0 +1,60 @@
+Sub ProcedimientoGeneral()
+
+Cells.ClearContents
+
+Call grupodealumnos  'Notas entre 0 y 20
+Call media
+Call desviacionestandar
+
+'Ordenar
+Call Ordenar
+Call desviacionestandargrupo1
+Call desviacionestandargrupo2
+Call desviacionestandargrupo3
+
+MsgBox ("Proceso terminado")
+
+End Sub
+
+Sub grupodealumnos()
+Dim i As Integer
+
+For i = 1 To 30
+    Cells(i, 1).Value = Application.WorksheetFunction.RandBetween(0, 20)
+Next
+
+End Sub
+Sub media()
+[C1] = Application.WorksheetFunction.Average(Range("A1:A30"))
+End Sub
+
+Sub desviacionestandar()
+[C2] = Application.WorksheetFunction.StDev(Range("A1:A30"))
+End Sub
+Sub Ordenar()
+'Procedimiento para ordenar
+    Hoja = ActiveSheet.Name
+    Range("A1:A30").Select
+    ActiveWorkbook.Worksheets(Hoja).Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets(Hoja).Sort.SortFields.Add Key:=Range("A1:A30"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets(Hoja).Sort
+        .SetRange Range("A1:A30")
+        .Header = xlGuess
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+End Sub
+Sub desviacionestandargrupo1()
+[C3] = Application.WorksheetFunction.StDev(Range("A1:A10"))
+End Sub
+
+Sub desviacionestandargrupo2()
+[C4] = Application.WorksheetFunction.StDev(Range("A11:A20"))
+End Sub
+Sub desviacionestandargrupo3()
+[C5] = Application.WorksheetFunction.StDev(Range("A21:A30"))
+End Sub
