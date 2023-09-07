@@ -1,0 +1,58 @@
+Sub Macro2()
+'
+' Macro2 Macro
+'
+
+'
+    ActiveSheet.ChartObjects("Gráfico 2").Activate
+    ActiveChart.ChartTitle.Select
+    
+    Selection.Format.TextFrame2.TextRange.Characters.Text = "XXXX"
+    With Selection.Format.TextFrame2.TextRange.Characters(1, 4).ParagraphFormat
+        .TextDirection = msoTextDirectionLeftToRight
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.Format.TextFrame2.TextRange.Characters(1, 4).Font
+        .BaselineOffset = 0
+        .Bold = msoTrue
+        .NameComplexScript = "Arial"
+        .NameFarEast = "Arial"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.RGB = RGB(0, 0, 0)
+        .Fill.Transparency = 0
+        .Fill.Solid
+        .Size = 10
+        .Italic = msoFalse
+        .Kerning = 12
+        .Name = "Arial"
+        .UnderlineStyle = msoNoUnderline
+        .Strike = msoNoStrike
+    End With
+    ActiveChart.ChartArea.Select
+End Sub
+
+Sub Graficos()
+
+  NuevosGraficos = 17
+  Punterofila = 18
+  
+  For NumGraf = 1 To NuevosGraficos
+  
+    ActiveSheet.ChartObjects("Gráfico 2").Activate
+    With ActiveChart
+    .ChartArea.Select
+    .ChartArea.Copy
+
+    Range("Base").Offset(Punterofila * NumGraf, 0).Select
+    ActiveSheet.Paste
+    
+    .SeriesCollection(1).Values = Range("Data").Offset(0, NumGraf)
+    .SeriesCollection(1).Name = Range("NombreBase").Offset(0, NumGraf)
+    .ChartTitle.Text = Range("NombreBase").Offset(0, NumGraf)
+    End With
+  Next
+  
+End Sub
+
+
+
