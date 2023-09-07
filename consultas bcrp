@@ -1,0 +1,145 @@
+Sub GetDataBCRP()
+
+Dim oHttp As MSXML2.XMLHTTP
+Dim sHtml As String
+Dim hDoc As HTMLDocument
+Dim hTable As HTMLTable
+Dim hRow As HTMLTableRow
+Dim hCell As HTMLTableCell
+Dim rStart As Range
+
+Dim sURL As String
+sURL = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01288PM-PN01289PM/html/2009-1/2018-12"
+
+Set oHttp = New MSXML2.XMLHTTP
+Set hDoc = New HTMLDocument
+Set rStart = Hoja1.Range("A1")
+
+oHttp.Open "GET", sURL
+oHttp.send
+
+Do
+DoEvents
+Loop Until oHttp.readyState = 4
+
+hDoc.body.innerHTML = oHttp.responseText
+
+For Each hTable In hDoc.all.tags("TABLE")
+    For Each hRow In hTable.Rows
+        For Each hCell In hRow.Cells
+            rStart.Offset(hRow.RowIndex, hCell.cellIndex).Value = hCell.innerText
+        Next hCell
+    Next hRow
+Next hTable
+
+End Sub
+Sub GetDataBCRP_Codigos1()
+
+Dim oHttp As MSXML2.XMLHTTP
+Dim sHtml As String
+Dim hDoc As HTMLDocument
+Dim hTable As HTMLTable
+Dim hRow As HTMLTableRow
+Dim hCell As HTMLTableCell
+Dim rStart As Range
+
+Dim sURL As String
+sURL = "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/inflacion"
+
+Set oHttp = New MSXML2.XMLHTTP
+Set hDoc = New HTMLDocument
+Set rStart = Hoja1.Range("A1")
+
+oHttp.Open "GET", sURL
+oHttp.send
+
+Do
+DoEvents
+Loop Until oHttp.readyState = 4
+
+hDoc.body.innerHTML = oHttp.responseText
+
+For Each hTable In hDoc.all.tags("TABLE")
+    For Each hRow In hTable.Rows
+        For Each hCell In hRow.Cells
+            rStart.Offset(hRow.RowIndex, hCell.cellIndex).Value = Chr(39) & hCell.innerText
+        Next hCell
+    Next hRow
+Next hTable
+
+End Sub
+
+Sub GetDataBCRP_Codigos2()
+
+Dim oHttp As MSXML2.XMLHTTP
+Dim sHtml As String
+Dim hDoc As HTMLDocument
+Dim hTable As HTMLTable
+Dim hRow As HTMLTableRow
+Dim hCell As HTMLTableCell
+Dim rStart As Range
+
+Dim sURL As String
+sURL = "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/inflacion"
+
+Set oHttp = New MSXML2.XMLHTTP
+Set hDoc = New HTMLDocument
+
+oHttp.Open "GET", sURL
+oHttp.send
+
+Do
+DoEvents
+Loop Until oHttp.readyState = 4
+
+hDoc.body.innerHTML = oHttp.responseText
+
+i = 0
+For Each hTable In hDoc.all.tags("TABLE")
+    Sheets.Add
+    ActiveSheet.Name = "data" & i
+    For Each hRow In hTable.Rows
+        For Each hCell In hRow.Cells
+            Range("A1").Offset(hRow.RowIndex, hCell.cellIndex).Value = Chr(39) & hCell.innerText
+        Next hCell
+    Next hRow
+    i = i + 1
+Next hTable
+
+End Sub
+
+Sub GetDataBCRP_Multiple()
+
+Dim oHttp As MSXML2.XMLHTTP
+Dim sHtml As String
+Dim hDoc As HTMLDocument
+Dim hTable As HTMLTable
+Dim hRow As HTMLTableRow
+Dim hCell As HTMLTableCell
+Dim rStart As Range
+
+Dim sURL As String
+sURL = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN01270PM-PN01288PM-PN01289PM-PN09813PM-PN01290PM-PN09814PM-PN01291PM-PN01292PM-PN01293PM-PN01336PM-PN01337PM-PN01338PM-PN09815PM-PN01294PM/html/2009-1/2018-12"
+
+Set oHttp = New MSXML2.XMLHTTP
+Set hDoc = New HTMLDocument
+Set rStart = Hoja1.Range("A1")
+
+oHttp.Open "GET", sURL
+oHttp.send
+
+Do
+DoEvents
+Loop Until oHttp.readyState = 4
+
+hDoc.body.innerHTML = oHttp.responseText
+
+For Each hTable In hDoc.all.tags("TABLE")
+    For Each hRow In hTable.Rows
+        For Each hCell In hRow.Cells
+            rStart.Offset(hRow.RowIndex, hCell.cellIndex).Value = Chr(39) & hCell.innerText
+        Next hCell
+    Next hRow
+Next hTable
+
+End Sub
