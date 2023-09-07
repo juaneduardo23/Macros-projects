@@ -1,0 +1,56 @@
+Sub SIAF_MEF()
+' 2da forma de copiar un HTMLTable (lo vamos a usar siempre)
+    Dim ieApp As InternetExplorer
+    Dim ieDoc As Object
+    Dim ieTab As Object
+    
+    Dim Ruta As String, Ext As String, anio As Integer
+
+For anio = 2012 To 2018
+
+    Ruta = "http://apps5.mineco.gob.pe/transparencia/Navegador/Navegar_7.aspx?&0=&1=E&27=&y="
+    Ext = "&cpage=1&psize=400"
+    Web = Ruta & anio & Ext
+    Debug.Print Web
+    
+    Sheets.Add
+    ActiveSheet.Name = anio
+    
+    Set ieApp = New InternetExplorer
+'----------------------------------------------------
+    With ieApp
+         .Navigate Web
+         Do While .Busy: DoEvents: Loop
+         Do Until .ReadyState = READYSTATE_COMPLETE: DoEvents: Loop
+         .Visible = True
+    End With
+            
+    Set ieDoc = ieApp.document
+    '---------------------------------------------------------------------
+    'Para raspar los datos del objeto HTMLTable
+    For i = 0 To ieDoc.all.Length - 1
+       Debug.Print TypeName(ieDoc.all(i))
+       If TypeName(ieDoc.all(i)) = "HTMLTable" Then
+           Set ieTbl = ieDoc.all(i)
+           If ieTbl.Rows.Length > 1 Then
+               For k = 1 To ieTbl.Rows.Length
+               On Error Resume Next
+               If ieTbl.Rows(k).Cells(0).innerText <> "" Then
+                    For j = 0 To ieTbl.Rows(k).Cells.Length - 1
+                        Cells(1 + k, j + 1).Value = ieTbl.Rows(k).Cells(j).innerText
+                    Next j
+               End If
+               Next k
+            End If
+        End If
+    Next i
+    'Stop
+    Set ieDoc = Nothing
+    ieApp.Quit
+    Set ieApp = Nothing
+    '---------------------------------------------------------------------
+Next
+    
+
+    
+End Sub
